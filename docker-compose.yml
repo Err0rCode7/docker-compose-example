@@ -1,0 +1,40 @@
+version: '3'
+
+services:
+  mysql_db:
+    build:
+      context: ./mysql
+      dockerfile: ./mysql.dockerfile
+    container_name: mysql_db
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: myapp
+      MYSQL_USER: test
+      MYSQL_PASSWORD: test
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - "./mysql/myapp/:/var/lib/mysql"
+    ports:
+      - "3306:3306"
+    networks:
+      - spring_app_net
+    cap_add:
+      - SYS_NICE
+
+  spring_app:
+    build:
+      context: ./myapp
+      dockerfile: ./myapp.dockerfile
+    container_name: spring_app
+    ports:
+      - 8080:8080
+    depends_on:
+      - mysql_db
+    # restart: on-failure
+    restart: always
+    networks: 
+      - spring_app_net
+    command: ./gradlew bootRun
+
+networks: 
+    spring_app_net:
