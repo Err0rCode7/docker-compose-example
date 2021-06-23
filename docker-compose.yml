@@ -1,6 +1,23 @@
 version: '3'
 
 services:
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: ./nginx.dockerfile
+    volumes:
+      - "./nginx/conf.d:/etc/nginx/conf.d"
+      - "./nginx/log/:/var/log/nginx/"
+    ports: 
+      - 80:80
+      - 443:443
+    restart: always
+    networks: 
+      - spring_app_net
+    depends_on: 
+      - spring_app
+    # command: nginx -g daemon off;
+
   mysql_db:
     build:
       context: ./mysql
@@ -26,8 +43,10 @@ services:
       context: ./myapp
       dockerfile: ./myapp.dockerfile
     container_name: spring_app
-    ports:
-      - 8080:8080
+    expose: 
+      - 8080
+    # ports:
+    #   - 8080:8080
     depends_on:
       - mysql_db
     # restart: on-failure
