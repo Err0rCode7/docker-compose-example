@@ -1,4 +1,4 @@
-FROM --platform=arm64 nginx
+FROM nginx
 
 ADD ./nginx-init-files/init.sh .
 
